@@ -2,26 +2,29 @@ name: ShieldOps CI
 
 on:
   push:
-    branches: ["main"]
+    branches: [ "main" ]
   pull_request:
-    branches: ["main"]
+    branches: [ "main" ]
 
 jobs:
-  lint:
-    name: Python Lint
+  build-and-test:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up python
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version:"3.12"
+          python-version: '3.12'
 
-      - name: Install Ruff
-        run: pip install ruff
+      - name: Install dependencies
+        run: |
+          cd app
+          pip install -r requirements.txt
 
-      - name: Run Ruff
-        run: ruff check app/
+      - name: Build Docker image
+        run: |
+          cd app
+          docker build -t shieldops-api:${{ github.sha }} .
