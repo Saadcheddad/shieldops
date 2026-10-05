@@ -35,17 +35,4 @@ jobs:
           fetch-depth: 0
 
       - name: Scan repository for secrets
-        run: pip install ruff
-    - name: Run Ruff
-      run: ruff check app/
-  secret-scan:
-    name: Gitleaks Secret Scan
-    runs-on: ubuntu-latest
-    steps:
-      - name: checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Scan repository for secrets
         uses: gitleaks/gitleaks-action@v2
