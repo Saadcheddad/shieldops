@@ -86,8 +86,11 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build image
-        run: docker build -t $IMAGE_NAME:${{ github.sha }} -t $IMAGE_NAME:latest ./app
+      - name: Build Docker image
+        run: |
+          # Convertit le nom d'utilisateur en minuscules pour respecter les règles de Docker/GHCR
+          GH_USER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          docker build -t ghcr.io/$GH_USER/$IMAGE_NAME:${{ github.sha }} ./app
 
       - name: Push image with commit SHA
         run: docker push $IMAGE_NAME:${{ github.sha }}
