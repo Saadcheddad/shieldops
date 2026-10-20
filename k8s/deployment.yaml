@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shieldops-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: shieldops
+  template:
+    metadata:
+      labels:
+        app: shieldops
+    spec:
+      containers:
+      - name: app
+        image: ghcr.io/saadcheddad/shieldops-api:0f51377fad0f940184d32ef716ee9d6966d96348
+        ports:
+        - containerPort: 8000
