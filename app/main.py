@@ -9,7 +9,7 @@ app = FastAPI(
 
 @app.get("/")
 def root():
-    return {"message": "ShieldOps API is running"}
+    return {"message": "ShieldOps API is running v2"}
 
 
 @app.get("/health")
