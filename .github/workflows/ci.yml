@@ -2,6 +2,7 @@ name: ShieldOps CI
 
 on:
   push:
+    paths-ignore: ['gitops/**']
     branches: ["main"]
   pull_request:
     branches: ["main"]
@@ -84,3 +85,23 @@ jobs:
           docker build -t $FULL_IMAGE:${{ github.sha }} -t $FULL_IMAGE:latest ./app
           docker push $FULL_IMAGE:${{ github.sha }}
           docker push $FULL_IMAGE:latest
+
+  update-gitops:
+    name: Update GitOps Tag
+    needs: [publish]
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Bump image tag
+        run: |
+          sed -i "s|image: ghcr.io/saadcheddad/shieldops-api:.*|image: ghcr.io/saadcheddad/shieldops-api:${GITHUB_SHA}|" gitops/workloads/shieldops-api/deployment.yaml
+      - name: Commit and push changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "gitops: deploy ${GITHUB_SHA}" || exit 0
+          git push
