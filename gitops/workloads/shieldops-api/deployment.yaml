@@ -17,3 +17,25 @@ spec:
         image: ghcr.io/saadcheddad/shieldops-api:2386786f4927bd3e2247855d87a08dd59b6b26be
         ports:
         - containerPort: 8000
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 1000
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop: ["ALL"]
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 200m
+            memory: 128Mi
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
