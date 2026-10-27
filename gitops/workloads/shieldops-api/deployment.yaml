@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
       - name: app
-        image: ghcr.io/saadcheddad/shieldops-api:3e693e553b70699f6dc5383bfe92f9e781e16a29
+        image: ghcr.io/saadcheddad/shieldops-api:2386786f4927bd3e2247855d87a08dd59b6b26be
         ports:
         - containerPort: 8000
