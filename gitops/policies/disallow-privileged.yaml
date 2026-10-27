@@ -6,7 +6,7 @@ metadata:
     policies.kyverno.io/title: Disallow Privileged Containers
     policies.kyverno.io/category: Pod Security Standards (Baseline)
 spec:
-  validationFailureAction: Audit
+  validationFailureAction: Enforce
   background: true
   rules:
   - name: privileged-containers
