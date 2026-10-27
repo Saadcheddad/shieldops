@@ -37,10 +37,26 @@ jobs:
       - name: Scan repository for secrets
         uses: gitleaks/gitleaks-action@v2
 
-  docker-security:
-    name: Docker Build and Trivy Scan
+  tests:
+    name: Run Pytest Suite
     runs-on: ubuntu-latest
-    needs: [lint, secret-scan]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: |
+          pip install -r app/requirements.txt pytest httpx
+      - name: Run tests
+        run: python -m pytest -q
+
+  docker-security:
+    name: Docker Build, SBOM & Trivy Scan
+    runs-on: ubuntu-latest
+    needs: [lint, secret-scan, tests]
     permissions:
       contents: read
     steps:
@@ -52,6 +68,13 @@ jobs:
           IMAGE_TAG=ghcr.io/$GH_USER/$IMAGE_NAME:${{ github.sha }}
           docker build -t $IMAGE_TAG ./app
           echo "BUILT_IMAGE=$IMAGE_TAG" >> $GITHUB_ENV
+
+      - name: Generate SBOM (Anchore Syft)
+        uses: anchore/sbom-action@v0
+        with:
+          image: ${{ env.BUILT_IMAGE }}
+          artifact-name: sbom.spdx.json
+
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
