@@ -1,5 +1,5 @@
-apiVersion: policies.kyverno.io/v1
-kind: ValidatingPolicy
+apiVersion: wgpolicyk8s.io/v1alpha2
+kind: ClusterPolicy
 metadata:
   name: require-run-as-nonroot
 spec:
@@ -8,17 +8,18 @@ spec:
   rules:
     - name: run-as-non-root
       match:
-        all:
+        any:
           - resources:
               kinds:
                 - Pod
       exclude:
-        all:
+        any:
           - resources:
               namespaces:
                 - falco
       validate:
-        cel:
-          expressions:
-            - expression: "has(object.spec.securityContext) && has(object.spec.securityContext.runAsNonRoot) && object.spec.securityContext.runAsNonRoot == true"
-              message: "Running as root is disallowed."
+        message: "Running as root is disallowed."
+        pattern:
+          spec:
+            securityContext:
+              runAsNonRoot: true

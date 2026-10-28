@@ -1,5 +1,5 @@
-apiVersion: policies.kyverno.io/v1
-kind: ValidatingPolicy
+apiVersion: wgpolicyk8s.io/v1alpha2
+kind: ClusterPolicy
 metadata:
   name: disallow-privileged-containers
 spec:
@@ -8,17 +8,19 @@ spec:
   rules:
     - name: validate-privileged
       match:
-        all:
+        any:
           - resources:
               kinds:
                 - Pod
       exclude:
-        all:
+        any:
           - resources:
               namespaces:
                 - falco
       validate:
-        cel:
-          expressions:
-            - expression: "object.spec.containers.all(c, !has(c.securityContext) || !has(c.securityContext.privileged) || c.securityContext.privileged == false)"
-              message: "Privileged mode is strictly forbidden."
+        message: "Privileged mode is strictly forbidden."
+        pattern:
+          spec:
+            containers:
+              - =(securityContext):
+                  =(privileged): false
