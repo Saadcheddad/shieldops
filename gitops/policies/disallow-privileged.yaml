@@ -14,9 +14,11 @@ spec:
                 - Pod
       exclude:
         any:
+          - clusterRoles:
+              - cluster-admin
           - resources:
-              namespaces:
-                - falco
+                namespaces:
+                  - falco
       validate:
         message: "Privileged mode is strictly forbidden."
         pattern:
