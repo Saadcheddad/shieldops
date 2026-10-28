@@ -1,0 +1,24 @@
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
+metadata:
+  name: require-pod-requests-limits
+spec:
+  validationFailureAction: Enforce
+  background: false
+  rules:
+    - name: validate-resources
+      match:
+        all:
+          - resources:
+              kinds:
+                - Pod
+      exclude:
+        all:
+          - resources:
+              namespaces:
+                - falco
+      validate:
+        cel:
+          expressions:
+            - expression: "object.spec.containers.all(c, has(c.resources) && has(c.resources.requests) && has(c.resources.limits) && has(c.resources.requests.cpu) && has(c.resources.requests.memory) && has(c.resources.limits.cpu) && has(c.resources.limits.memory))"
+              message: "CPU and memory requests and limits are required for all containers."
